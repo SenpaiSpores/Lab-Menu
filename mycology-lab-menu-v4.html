@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SenpaiSpores — Mycology Lab Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --base:#092327;
+    --base2:#0c2b30;
+    --primary:#00A9A5;
+    --secondary:#0B5351;
+    --text2:#E8B4B8;
+    --text1:#f1efe9;
+    --display:'Fraunces', serif;
+    --body:'Spectral', serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--base);
+    color:var(--text1);
+    font-family:var(--body);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  :focus-visible{outline:2px solid var(--primary);outline-offset:3px;}
+
+  main{max-width:760px;margin:0 auto;padding:64px 24px 40px;}
+
+  /* HERO / LOGO */
+  .intro{display:grid;grid-template-columns:1fr 280px;gap:36px;align-items:center;margin-bottom:56px;}
+  .logo-lockup{display:inline-flex;align-items:center;gap:10px;margin:0 0 10px;cursor:pointer;background:none;border:none;padding:0;}
+  .logo-svg{overflow:visible;flex:0 0 auto;transition:transform 220ms ease-out;}
+  .logo-core{transform-origin:30px 32px;animation:corePulse 4.5s ease-in-out infinite;}
+  @keyframes corePulse{0%,100%{r:3.1;opacity:1;}50%{r:3.5;opacity:.82;}}
+  .logo-edge{fill:none;stroke:var(--secondary);stroke-width:1;opacity:.8;}
+  .logo-word{font-family:var(--display);font-style:italic;font-weight:500;color:var(--primary);font-size:1.25rem;}
+  .intro h1{font-family:var(--display);font-weight:500;font-size:clamp(2rem,4.2vw,2.7rem);line-height:1.12;margin:0 0 12px;}
+  .intro p.lede{font-size:1.02rem;line-height:1.65;margin:0 0 10px;max-width:52ch;}
+  .intro p.tag{color:var(--text2);font-style:italic;font-size:.95rem;margin:0;}
+  .shelf-illustration{opacity:.9;background:transparent;border:none;padding:0;display:block;width:100%;}
+  .shelf-illustration svg{transition:filter 260ms ease;display:block;width:100%;}
+  .poke-note{font-size:.8rem;color:var(--text2);font-style:italic;margin:8px 0 0;min-height:1.2em;opacity:0;transition:opacity 400ms ease;}
+  .poke-note.show{opacity:1;}
+  .logo-note{font-size:.78rem;color:var(--text2);font-style:italic;margin:2px 0 0;opacity:0;transition:opacity 400ms ease;}
+  .logo-note.show{opacity:1;}
+
+  /* CATEGORY SECTIONS */
+  .cat-section{padding:34px 0;border-top:1px solid var(--secondary);}
+  .cat-head{margin-bottom:6px;}
+  .cat-head h2{font-family:var(--display);font-weight:500;font-size:1.5rem;margin:0;}
+  .cat-intro{color:var(--text2);font-size:.92rem;font-style:italic;margin:0 0 22px;max-width:56ch;}
+
+  /* Responsive flex grid — used for categories that are not exactly 3 items */
+  .specimen-grid{display:flex;flex-wrap:wrap;gap:16px;}
+  .specimen-grid .specimen-card{flex:1 1 220px;max-width:280px;}
+
+  .specimen-card{border:1px solid var(--secondary);border-radius:10px;padding:20px;background:var(--base2);transition:border-color 260ms ease, box-shadow 260ms ease;}
+  .specimen-card:hover,.specimen-card:focus-within{border-color:var(--primary);box-shadow:0 0 14px rgba(0,169,165,.16);}
+  .card-top{text-align:center;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--secondary);}
+  .card-icon{width:26px;height:26px;margin:0 auto 8px;color:var(--primary);opacity:.85;}
+  .card-icon svg{width:100%;height:100%;}
+  .card-top h3{font-family:var(--display);font-weight:500;font-size:1.15rem;margin:0 0 3px;}
+  .card-top .meta{color:var(--text2);font-size:.75rem;margin:0;}
+  .card-body p.desc{font-size:.88rem;line-height:1.45;margin:0 0 14px;}
+  .card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .card-foot .price{font-size:1rem;font-weight:600;}
+  .link-btn{background:transparent;border:none;color:var(--primary);font-size:.82rem;font-family:var(--body);padding:0;}
+  .link-btn:hover,.link-btn:focus-visible{text-decoration:underline;}
+
+  /* TRIANGLE LAYOUT — used for categories with exactly 3 items */
+  .triangle-wrap{position:relative;max-width:600px;margin:0 auto;}
+  .tri-network{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible;}
+  .edge{fill:none;stroke:var(--secondary);stroke-width:.6;opacity:.55;transition:stroke 380ms ease-out, opacity 380ms ease-out, stroke-width 380ms ease-out;}
+  .edge.lit{stroke:var(--primary);opacity:1;stroke-width:1;}
+  .node{fill:var(--secondary);opacity:.4;transition:opacity 380ms ease-out, fill 380ms ease-out;}
+  .node.lit{fill:var(--primary);opacity:.9;}
+
+  .triangle-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"top top" "left right";gap:18px;}
+  .tri-top{grid-area:top;justify-self:center;width:76%;}
+  .tri-left{grid-area:left;}
+  .tri-right{grid-area:right;}
+  .tri-card{transition:transform 400ms cubic-bezier(.22,1,.36,1), box-shadow 400ms cubic-bezier(.22,1,.36,1), opacity 400ms cubic-bezier(.22,1,.36,1);}
+  .triangle-wrap.has-active .tri-card{opacity:.78;}
+  .tri-card.is-active{transform:scale(1.045);opacity:1 !important;box-shadow:0 0 22px rgba(0,169,165,.35);border-color:var(--primary);position:relative;z-index:2;}
+
+  @media (max-width:560px){
+    .triangle-grid{grid-template-columns:1fr;grid-template-areas:"top" "left" "right";}
+    .tri-top,.tri-left,.tri-right{width:100%;}
+    .tri-network{display:none;}
+  }
+
+  /* OVERLAY */
+  .overlay{position:fixed;inset:0;background:rgba(9,35,39,.85);display:flex;align-items:center;justify-content:center;z-index:30;padding:20px;
+    opacity:0;visibility:hidden;transition:opacity 320ms cubic-bezier(.22,1,.36,1), visibility 0s linear 320ms;}
+  .overlay.show{opacity:1;visibility:visible;transition:opacity 320ms cubic-bezier(.22,1,.36,1), visibility 0s;}
+  .overlay-panel{background:var(--base2);border:1px solid var(--primary);border-radius:14px;max-width:400px;width:100%;padding:28px;position:relative;
+    transform:translateY(10px);opacity:0;transition:transform 340ms cubic-bezier(.22,1,.36,1), opacity 340ms cubic-bezier(.22,1,.36,1);}
+  .overlay.show .overlay-panel{transform:translateY(0);opacity:1;}
+  .overlay-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--text2);font-size:1.25rem;line-height:1;}
+  .overlay-close:hover,.overlay-close:focus-visible{color:var(--primary);}
+  .overlay-panel .cat{color:var(--text2);font-size:.78rem;margin:0 0 6px;}
+  .overlay-panel h3{font-family:var(--display);font-weight:500;font-size:1.7rem;margin:0 0 10px;}
+  .overlay-panel p.desc{font-size:.98rem;line-height:1.55;margin:0 0 16px;}
+  .overlay-panel .price{font-size:1.2rem;font-weight:600;margin:0 0 4px;}
+  .overlay-panel .meta{color:var(--text2);font-size:.85rem;margin:0;}
+
+  footer{max-width:760px;margin:0 auto;padding:24px 24px 48px;color:var(--text2);font-size:.82rem;border-top:1px solid var(--secondary);position:relative;}
+  .full-bench-note{font-family:var(--display);font-style:italic;color:var(--primary);font-size:.95rem;margin-top:10px;opacity:0;transition:opacity 500ms ease;}
+  .full-bench-note.show{opacity:1;}
+
+  /* bloom toast for keyboard easter egg */
+  .bloom-toast{position:fixed;bottom:20px;right:20px;background:var(--base2);border:1px solid var(--primary);color:var(--text1);font-family:var(--display);font-style:italic;font-size:.9rem;padding:10px 16px;border-radius:10px;box-shadow:0 0 20px rgba(0,169,165,.4);opacity:0;transform:translateY(8px);transition:opacity 350ms ease, transform 350ms ease;pointer-events:none;z-index:40;}
+  .bloom-toast.show{opacity:1;transform:translateY(0);}
+
+  @media (max-width:600px){
+    .intro{grid-template-columns:1fr;}
+    .shelf-illustration{max-width:280px;margin:0 auto;order:-1;}
+    main{padding-top:44px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition-duration:1ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <section class="intro">
+    <div>
+      <button class="logo-lockup" id="logoMark" type="button" aria-label="SenpaiSpores home mark">
+        <svg class="logo-svg" viewBox="0 0 60 40" width="50" height="34" aria-hidden="true">
+          <g id="logoNodes">
+            <path class="logo-edge" d="M30 32 Q22 24 14 20"/>
+            <path class="logo-edge" d="M30 32 Q34 22 44 16"/>
+            <path class="logo-edge" d="M30 32 Q30 20 30 8"/>
+            <circle cx="14" cy="20" r="1.6" fill="var(--primary)" opacity=".8"/>
+            <circle cx="44" cy="16" r="1.6" fill="var(--text2)" opacity=".85"/>
+            <circle cx="30" cy="8" r="1.6" fill="var(--primary)" opacity=".65"/>
+            <circle class="logo-core" cx="30" cy="32" r="3.1" fill="var(--primary)"/>
+          </g>
+        </svg>
+        <span class="logo-word">SenpaiSpores</span>
+      </button>
+      <p class="logo-note" id="logoNote" aria-live="polite"></p>
+      <h1>A small bench of live cultures.</h1>
+      <p class="lede">We keep cultures, agar and the growing media to take them further — made in small batches, in a spare room, not a factory. What's listed below is what's actually on the shelf.</p>
+      <p class="tag">small batches / strange fungi</p>
+    </div>
+    <button class="shelf-illustration" id="shelfBtn" aria-label="An illustrated workbench with a flow hood, petri dishes and lab notes. Try clicking it a few times." type="button">
+      <svg id="shelfSvg" viewBox="0 0 600 380" width="100%" aria-hidden="true">
+
+        <g id="bench-surface">
+          <path d="M10,335 L590,335 L545,295 L55,295 Z" fill="var(--secondary)" fill-opacity=".07" stroke="var(--secondary)" stroke-width="1.1"/>
+          <line x1="55" y1="295" x2="545" y2="295" stroke="var(--secondary)" stroke-width=".7" opacity=".5"/>
+        </g>
+
+        <g id="flow-hood">
+          <path d="M205,150 L395,150 L415,105 L185,105 Z" fill="var(--secondary)" fill-opacity=".14" stroke="var(--secondary)" stroke-width="1.2"/>
+          <g stroke="var(--primary)" stroke-width=".8" opacity=".5">
+            <line x1="200" y1="140" x2="400" y2="140"/>
+            <line x1="203" y1="132" x2="397" y2="132"/>
+            <line x1="206" y1="124" x2="394" y2="124"/>
+            <line x1="209" y1="116" x2="391" y2="116"/>
+          </g>
+          <rect x="215" y="150" width="170" height="110" rx="4" fill="var(--secondary)" fill-opacity=".1" stroke="var(--secondary)" stroke-width="1.3"/>
+          <rect x="232" y="168" width="136" height="70" rx="2" fill="var(--primary)" fill-opacity=".06" stroke="var(--primary)" stroke-width="1"/>
+          <line x1="225" y1="230" x2="378" y2="230" stroke="var(--secondary)" stroke-width="1"/>
+          <line x1="235" y1="260" x2="235" y2="295" stroke="var(--secondary)" stroke-width="1.3"/>
+          <line x1="365" y1="260" x2="365" y2="295" stroke="var(--secondary)" stroke-width="1.3"/>
+          <circle cx="360" cy="158" r="2.4" fill="var(--primary)"/>
+        </g>
+
+        <g id="petri-cluster">
+          <ellipse cx="118" cy="278" rx="34" ry="11" fill="var(--secondary)" fill-opacity=".12" stroke="var(--secondary)" stroke-width="1"/>
+          <ellipse cx="108" cy="296" rx="40" ry="13" fill="var(--secondary)" fill-opacity=".14" stroke="var(--secondary)" stroke-width="1.1"/>
+          <ellipse cx="108" cy="293" rx="34" ry="10" fill="none" stroke="var(--secondary)" stroke-width=".7" opacity=".6"/>
+          <ellipse cx="192" cy="308" rx="46" ry="15" fill="var(--secondary)" fill-opacity=".08" stroke="var(--secondary)" stroke-width="1.1"/>
+          <ellipse cx="192" cy="305" rx="40" ry="12" fill="var(--primary)" fill-opacity=".04"/>
+          <g stroke="var(--primary)" stroke-width=".6" fill="none" opacity=".8">
+            <path d="M185,305 q-8,-4 -14,-2 q-4,1 -8,5"/>
+            <path d="M185,305 q6,-6 12,-4 q5,2 9,-2"/>
+            <path d="M185,305 q-3,6 -10,7 q-5,1 -9,5"/>
+            <path d="M185,305 q10,3 16,8 q4,3 9,3"/>
+            <path d="M185,305 q2,-9 -3,-13"/>
+          </g>
+          <g fill="var(--primary)" opacity=".85">
+            <circle cx="171" cy="303" r=".9"/>
+            <circle cx="197" cy="299" r=".8"/>
+            <circle cx="175" cy="312" r=".8"/>
+            <circle cx="201" cy="316" r=".9"/>
+            <circle cx="182" cy="292" r=".7"/>
+          </g>
+        </g>
+
+        <g id="syringes">
+          <g transform="rotate(10 420 320)">
+            <rect x="390" y="315" width="60" height="10" rx="3" fill="var(--secondary)" fill-opacity=".12" stroke="var(--secondary)" stroke-width="1"/>
+            <line x1="450" y1="320" x2="472" y2="320" stroke="var(--secondary)" stroke-width="1.2"/>
+            <rect x="383" y="312" width="7" height="16" fill="var(--secondary)" fill-opacity=".2" stroke="var(--secondary)" stroke-width=".7"/>
+            <line x1="380" y1="320" x2="366" y2="320" stroke="var(--secondary)" stroke-width="1.4"/>
+          </g>
+          <g transform="rotate(-16 340 300)">
+            <rect x="300" y="294" width="80" height="12" rx="3" fill="var(--secondary)" fill-opacity=".12" stroke="var(--secondary)" stroke-width="1"/>
+            <line x1="380" y1="300" x2="410" y2="300" stroke="var(--secondary)" stroke-width="1.4"/>
+            <rect x="292" y="291" width="8" height="18" fill="var(--secondary)" fill-opacity=".2" stroke="var(--secondary)" stroke-width=".8"/>
+            <line x1="288" y1="300" x2="270" y2="300" stroke="var(--secondary)" stroke-width="1.6"/>
+            <g stroke="var(--primary)" stroke-width=".6" opacity=".6">
+              <line x1="315" y1="296" x2="315" y2="304"/>
+              <line x1="330" y1="296" x2="330" y2="304"/>
+              <line x1="345" y1="296" x2="345" y2="304"/>
+              <line x1="360" y1="296" x2="360" y2="304"/>
+            </g>
+          </g>
+        </g>
+
+        <g id="vessel">
+          <rect x="486" y="240" width="46" height="58" rx="5" fill="var(--secondary)" fill-opacity=".1" stroke="var(--secondary)" stroke-width="1.1"/>
+          <rect x="496" y="228" width="26" height="12" rx="2" fill="none" stroke="var(--secondary)" stroke-width="1"/>
+          <g stroke="var(--primary)" stroke-width=".6" fill="none" opacity=".7">
+            <path d="M500,280 q4,-8 10,-6 q6,2 8,-4"/>
+            <path d="M498,265 q6,-3 9,2"/>
+          </g>
+          <g fill="var(--primary)" opacity=".75">
+            <circle cx="502" cy="278" r=".8"/>
+            <circle cx="515" cy="270" r=".7"/>
+            <circle cx="508" cy="260" r=".7"/>
+          </g>
+        </g>
+
+        <g id="lab-notes">
+          <g transform="rotate(-6 90 90)">
+            <rect x="40" y="55" width="100" height="70" rx="3" fill="var(--text1)" fill-opacity=".05" stroke="var(--secondary)" stroke-width="1"/>
+            <g stroke="var(--text2)" stroke-width=".7" fill="none" opacity=".7">
+              <path d="M52,72 q6,-3 12,0 q6,3 11,-1"/>
+              <path d="M52,82 q10,2 18,-1"/>
+              <path d="M52,92 q7,-2 14,1 q5,2 10,-1"/>
+            </g>
+            <ellipse cx="112" cy="100" rx="14" ry="8" fill="none" stroke="var(--text2)" stroke-width=".7" opacity=".7"/>
+            <path d="M96,108 q10,6 20,3" fill="none" stroke="var(--text2)" stroke-width=".6" opacity=".6"/>
+          </g>
+          <g transform="rotate(5 520 340)">
+            <rect x="470" y="315" width="90" height="55" rx="3" fill="var(--text1)" fill-opacity=".05" stroke="var(--secondary)" stroke-width="1"/>
+            <g stroke="var(--text2)" stroke-width=".7" fill="none" opacity=".7">
+              <path d="M482,330 q6,-2 12,1 q5,2 9,-1"/>
+              <path d="M482,340 q9,2 16,-1"/>
+            </g>
+            <path d="M500,352 l14,-2 l-3,-4" fill="none" stroke="var(--primary)" stroke-width=".7" opacity=".7"/>
+            <rect x="536" y="322" width="14" height="8" rx="1.5" fill="none" stroke="var(--text2)" stroke-width=".6"/>
+            <circle cx="543" cy="326" r="1" fill="var(--text2)"/>
+          </g>
+        </g>
+
+        <g id="mycelium-ambient" stroke="var(--primary)" stroke-width=".5" fill="none" opacity=".18">
+          <path d="M195,320 q10,10 4,22"/>
+          <path d="M205,318 q14,6 12,18"/>
+        </g>
+      </svg>
+    </button>
+  </section>
+  <p class="poke-note" id="pokeNote" aria-live="polite"></p>
+
+  <div id="sections"></div>
+</main>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="ovName">
+  <div class="overlay-panel">
+    <button class="overlay-close" id="ovClose" aria-label="Close specimen detail">✕</button>
+    <p class="cat" id="ovCat"></p>
+    <h3 id="ovName"></h3>
+    <p class="desc" id="ovDesc"></p>
+    <p class="price" id="ovPrice"></p>
+    <p class="meta" id="ovMeta"></p>
+  </div>
+</div>
+
+<footer>
+  SenpaiSpores — a small bench in a spare room. Prices in ₹, stock changes weekly.
+  <p class="full-bench-note" id="fullBenchNote">You've opened a jar from every shelf. The bench approves.</p>
+</footer>
+
+<div class="bloom-toast" id="bloomToast">the mycelium heard you.</div>
+
+<script>
+const products = [
+  { id:"lc-01", category:"Liquid Culture", categoryCode:"LC", name:"Nebula", description:"A cloudy little bottle of mycelial ambition, ready to colonise something useful.", price:499, metadata:"10 ml" },
+  { id:"lc-02", category:"Liquid Culture", categoryCode:"LC", name:"Mooncap", description:"Mycelium in suspension — tiny fungal commuters looking for somewhere to move in.", price:499, metadata:"10 ml" },
+  { id:"lc-03", category:"Liquid Culture", categoryCode:"LC", name:"Forest Ghost", description:"A little bottle of living culture with absolutely no plans to sit still.", price:549, metadata:"10 ml" },
+  { id:"agar-01", category:"Agar Plates", categoryCode:"AGAR", name:"Nebula", description:"A tiny laboratory apartment where the mycelium gets its own plot of land.", price:149, metadata:"90 mm plate" },
+  { id:"agar-02", category:"Agar Plates", categoryCode:"AGAR", name:"Mooncap", description:"Clean, contained and ready for some serious fuzzy business.", price:149, metadata:"90 mm plate" },
+  { id:"agar-03", category:"Agar Plates", categoryCode:"AGAR", name:"Forest Ghost", description:"For when you would rather watch the mycelium make its moves.", price:169, metadata:"90 mm plate" },
+  { id:"grain-01", category:"Sterilised Grain", categoryCode:"GRAIN", name:"Millet", description:"Tiny grains, big ambitions. Your mycelium just needs to move in.", price:299, metadata:"1 kg · Sterilised" },
+  { id:"grain-02", category:"Sterilised Grain", categoryCode:"GRAIN", name:"Wheat", description:"A ready-made fungal pantry, because dinner is already sorted.", price:299, metadata:"1 kg · Sterilised" },
+  { id:"substrate-01", category:"Pasteurised Substrate", categoryCode:"SUB", name:"Forest Floor", description:"One kilogram of mushroom real estate. Your mycelium just needs to move in.", price:349, metadata:"1 kg · Pasteurised" }
+];
+
+const categories = [
+  { key:"Liquid Culture", label:"Liquid Culture", intro:"Live mycelium suspended in nutrient broth — the fastest way to start a new colonisation." },
+  { key:"Agar Plates", label:"Agar Plates", intro:"Poured plates for isolating a clean strain, or just watching mycelium spread." },
+  { key:"Sterilised Grain", label:"Grain Spawn", intro:"Pre-sterilised grain jars, ready to be inoculated and bulked up." },
+  { key:"Pasteurised Substrate", label:"Substrate", intro:"Ready-to-colonise growing medium for the final stage." }
+];
+
+const icons = {
+  "Liquid Culture": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6l-4.5 9a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M8.5 15h7"/></svg>`,
+  "Agar Plates": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="9.5" rx="9" ry="4"/></svg>`,
+  "Sterilised Grain": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12"/><path d="M7 3v3l-2 3v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9l-2-3V3"/></svg>`,
+  "Pasteurised Substrate": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="10" rx="1.5"/><path d="M3 12h18"/></svg>`
+};
+
+function cardHTML(p){
+  return `
+    <div class="card-top">
+      <div class="card-icon">${icons[p.category]}</div>
+      <h3>${p.name}</h3>
+      <p class="meta">${p.categoryCode} · ${p.metadata}</p>
+    </div>
+    <div class="card-body">
+      <p class="desc">${p.description}</p>
+      <div class="card-foot">
+        <span class="price">₹${p.price}</span>
+        <button class="link-btn">Full details</button>
+      </div>
+    </div>`;
+}
+
+function bindCard(card, p){
+  card.querySelector('.link-btn').addEventListener('click', ()=> openOverlay(p));
+}
+
+const sectionsEl = document.getElementById('sections');
+categories.forEach(c=>{
+  const items = products.filter(p=>p.category===c.key);
+  const section = document.createElement('section');
+  section.className = 'cat-section';
+  section.innerHTML = `<div class="cat-head"><h2>${c.label}</h2></div><p class="cat-intro">${c.intro}</p>`;
+
+  if(items.length === 3){
+    // triangular composition with a delicate mycelial network
+    const wrap = document.createElement('div');
+    wrap.className = 'triangle-wrap';
+    wrap.innerHTML = `
+      <svg class="tri-network" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
+        <path class="edge edge-tl" d="M50,10 Q34,32 18,56"/>
+        <path class="edge edge-tr" d="M50,10 Q66,32 82,56"/>
+        <path class="edge edge-lr" d="M18,56 Q50,68 82,56"/>
+        <circle class="node node-tl" cx="34" cy="32" r="1"/>
+        <circle class="node node-tr" cx="66" cy="32" r="1"/>
+        <circle class="node node-lr" cx="50" cy="66" r="1"/>
+      </svg>
+      <div class="triangle-grid">
+        <article class="specimen-card tri-card tri-top" data-edges="tl tr"></article>
+        <article class="specimen-card tri-card tri-left" data-edges="tl lr"></article>
+        <article class="specimen-card tri-card tri-right" data-edges="tr lr"></article>
+      </div>`;
+    const slots = [wrap.querySelector('.tri-top'), wrap.querySelector('.tri-left'), wrap.querySelector('.tri-right')];
+    slots.forEach((card, i)=>{
+      card.innerHTML = cardHTML(items[i]);
+      bindCard(card, items[i]);
+      const edgeNames = card.dataset.edges.split(' ');
+      function activate(){
+        wrap.classList.add('has-active');
+        card.classList.add('is-active');
+        edgeNames.forEach(e=>{
+          wrap.querySelector('.edge-'+e).classList.add('lit');
+          wrap.querySelector('.node-'+e).classList.add('lit');
+        });
+      }
+      function deactivate(){
+        wrap.classList.remove('has-active');
+        card.classList.remove('is-active');
+        edgeNames.forEach(e=>{
+          wrap.querySelector('.edge-'+e).classList.remove('lit');
+          wrap.querySelector('.node-'+e).classList.remove('lit');
+        });
+      }
+      card.addEventListener('mouseenter', activate);
+      card.addEventListener('mouseleave', deactivate);
+      card.addEventListener('focusin', activate);
+      card.addEventListener('focusout', deactivate);
+      card.addEventListener('touchstart', activate, {passive:true});
+      card.addEventListener('touchend', deactivate);
+    });
+    section.appendChild(wrap);
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'specimen-grid';
+    items.forEach(p=>{
+      const card = document.createElement('article');
+      card.className = 'specimen-card';
+      card.innerHTML = cardHTML(p);
+      bindCard(card, p);
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+  }
+  sectionsEl.appendChild(section);
+});
+
+const overlay = document.getElementById('overlay');
+const visitedCats = new Set();
+function openOverlay(p){
+  document.getElementById('ovCat').textContent = p.category;
+  document.getElementById('ovName').textContent = p.name;
+  document.getElementById('ovDesc').textContent = p.description;
+  document.getElementById('ovPrice').textContent = '₹' + p.price;
+  document.getElementById('ovMeta').textContent = p.metadata;
+  overlay.classList.add('show');
+  document.getElementById('ovClose').focus();
+
+  visitedCats.add(p.category);
+  if(visitedCats.size === categories.length){
+    document.getElementById('fullBenchNote').classList.add('show');
+  }
+}
+function closeOverlay(){ overlay.classList.remove('show'); }
+document.getElementById('ovClose').addEventListener('click', closeOverlay);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeOverlay(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeOverlay(); });
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// easter egg 1: poke the shelf illustration
+let shelfClicks = 0;
+const shelfNotes = [
+  "the vial wobbles slightly.",
+  "the dish does not appreciate this.",
+  "the jar remains unbothered.",
+  "the block is, frankly, ignoring you.",
+  "okay, that's enough poking for one day."
+];
+document.getElementById('shelfBtn').addEventListener('click', function(){
+  const note = document.getElementById('pokeNote');
+  note.textContent = shelfNotes[Math.min(shelfClicks, shelfNotes.length-1)];
+  note.classList.add('show');
+  document.getElementById('shelfSvg').style.filter = 'drop-shadow(0 0 10px rgba(0,169,165,.6))';
+  setTimeout(()=>{ document.getElementById('shelfSvg').style.filter=''; }, 500);
+  shelfClicks++;
+  if(shelfClicks >= shelfNotes.length){
+    shelfClicks = 0;
+    setTimeout(()=> note.classList.remove('show'), 2400);
+  }
+});
+
+// easter egg 2: full-bench note (handled in openOverlay above)
+
+// easter egg 3: click the logo mark a few times
+let logoClicks = 0;
+const logoNotes = [
+  "hello.",
+  "still just a logo.",
+  "the network runs deeper than it looks.",
+  "okay, secret's out — there isn't one. or is there."
+];
+document.getElementById('logoMark').addEventListener('click', function(){
+  const note = document.getElementById('logoNote');
+  note.textContent = logoNotes[Math.min(logoClicks, logoNotes.length-1)];
+  note.classList.add('show');
+  logoClicks++;
+  clearTimeout(window._logoNoteTimer);
+  window._logoNoteTimer = setTimeout(()=> note.classList.remove('show'), 2800);
+});
+
+// subtle cursor-proximity parallax on the logo mark
+if(!reduceMotion){
+  document.addEventListener('mousemove', e=>{
+    const rect = document.getElementById('logoMark').getBoundingClientRect();
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    const dx = (e.clientX - cx) / 40, dy = (e.clientY - cy) / 40;
+    const clampedX = Math.max(-3, Math.min(3, dx));
+    const clampedY = Math.max(-3, Math.min(3, dy));
+    document.getElementById('logoNodes').style.transform = `translate(${clampedX}px, ${clampedY}px)`;
+  }, { passive:true });
+}
+
+// easter egg 4: type "spore" anywhere for a brief mycelial bloom
+let typedBuffer = '';
+document.addEventListener('keydown', e=>{
+  if(e.key.length !== 1) return;
+  typedBuffer = (typedBuffer + e.key).slice(-5).toLowerCase();
+  if(typedBuffer === 'spore'){
+    document.querySelectorAll('.edge').forEach(el=>el.classList.add('lit'));
+    document.querySelectorAll('.node').forEach(el=>el.classList.add('lit'));
+    const toast = document.getElementById('bloomToast');
+    toast.classList.add('show');
+    setTimeout(()=>{
+      document.querySelectorAll('.edge.lit').forEach(el=>{ if(!el.closest('.triangle-wrap.has-active')) el.classList.remove('lit'); });
+      document.querySelectorAll('.node.lit').forEach(el=>{ if(!el.closest('.triangle-wrap.has-active')) el.classList.remove('lit'); });
+      toast.classList.remove('show');
+    }, 1600);
+  }
+});
+</script>
+</body>
+</html>
